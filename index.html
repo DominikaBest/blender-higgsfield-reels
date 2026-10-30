@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Directing an AI shot with a phone — Blender × VirtuCam × Higgsfield Seedance 2.5</title>
+<meta name="description" content="A 15-second single take built as a grey Blender blockout, shot with an iPhone through VirtuCam, and rendered by Higgsfield Seedance 2.5. The full process, references, prompts and lessons.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#15110d; --panel:#1e1812; --panel2:#261e16; --ink:#f3e9dc; --muted:#b9a892; --dim:#7d6e5c;
+    --gold:#e8a64a; --rust:#c8693a; --line:#3a2f24; --code:#120e0a;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--gold)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  header.hero{padding:72px 0 40px;border-bottom:1px solid var(--line);background:
+     radial-gradient(1200px 400px at 80% -10%, rgba(232,166,74,.18), transparent 60%),
+     radial-gradient(800px 300px at 0% 0%, rgba(200,105,58,.12), transparent 60%)}
+  .kicker{font:500 12px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+  h1{font:600 clamp(34px,5.4vw,60px)/1.04 Fraunces,serif;margin:16px 0 18px;letter-spacing:-.01em}
+  h1 em{font-style:italic;font-weight:400;color:var(--gold)}
+  .lede{font-size:19px;color:var(--muted);max-width:760px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .chip{font:500 12px 'JetBrains Mono',monospace;padding:6px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:rgba(255,255,255,.02)}
+  nav.toc{position:sticky;top:0;z-index:5;background:rgba(21,17,13,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  nav.toc .wrap{display:flex;gap:18px;overflow-x:auto;padding-top:12px;padding-bottom:12px;white-space:nowrap}
+  nav.toc a{color:var(--muted);text-decoration:none;font:500 13px Inter}
+  nav.toc a:hover{color:var(--gold)}
+  section{padding:56px 0;border-bottom:1px solid var(--line)}
+  h2{font:600 32px/1.15 Fraunces,serif;margin:0 0 8px}
+  h2 .n{font:500 13px 'JetBrains Mono',monospace;color:var(--gold);display:block;margin-bottom:10px;letter-spacing:.1em}
+  h3{font:600 20px/1.3 Fraunces,serif;margin:28px 0 8px}
+  p{margin:0 0 14px} .muted{color:var(--muted)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+  figure{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  figure video, figure img{display:block;width:100%;height:auto;background:#000}
+  figcaption{padding:12px 14px;font-size:14px;color:var(--muted)}
+  figcaption b{color:var(--ink);font-weight:600}
+  .player-controls{display:flex;gap:10px;align-items:center;margin:14px 0 0}
+  button{font:600 13px Inter;background:var(--gold);color:#1b130a;border:0;border-radius:8px;padding:10px 16px;cursor:pointer}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  button:hover{filter:brightness(1.08)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 22px}
+  .layers{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+  @media(max-width:820px){.layers{grid-template-columns:1fr}}
+  .layer .tag{font:500 11px 'JetBrains Mono',monospace;color:var(--gold);letter-spacing:.12em;text-transform:uppercase}
+  .layer h4{font:600 18px Fraunces,serif;margin:6px 0 6px}
+  .layer p{font-size:14.5px;color:var(--muted);margin:0}
+  ol.steps{list-style:none;counter-reset:s;padding:0;margin:20px 0 0}
+  ol.steps>li{counter-increment:s;position:relative;padding:18px 20px 18px 66px;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:12px}
+  ol.steps>li::before{content:counter(s,decimal-leading-zero);position:absolute;left:20px;top:18px;font:600 18px 'JetBrains Mono',monospace;color:var(--gold)}
+  ol.steps h4{margin:0 0 6px;font:600 17px Inter}
+  ol.steps p{margin:0 0 8px;color:var(--muted);font-size:15px}
+  ol.steps p:last-child{margin-bottom:0}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;margin-top:10px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font:600 12px 'JetBrains Mono',monospace;color:var(--gold);letter-spacing:.08em;text-transform:uppercase}
+  td:first-child{white-space:nowrap;color:var(--ink);font-family:'JetBrains Mono',monospace;font-size:13px}
+  td{color:var(--muted)}
+  .prompt{position:relative;background:var(--code);border:1px solid var(--line);border-radius:10px;margin:12px 0 18px}
+  .prompt .bar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);font:500 12px 'JetBrains Mono',monospace;color:var(--dim)}
+  .prompt pre{margin:0;padding:14px 16px;white-space:pre-wrap;word-wrap:break-word;font:13px/1.6 'JetBrains Mono',monospace;color:#e9dccb;max-height:420px;overflow:auto}
+  .prompt button{padding:5px 10px;font-size:12px}
+  .settings{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+  .settings span{font:12px 'JetBrains Mono',monospace;background:var(--panel2);border:1px solid var(--line);padding:4px 8px;border-radius:6px;color:var(--muted)}
+  .note{border-left:3px solid var(--gold);background:rgba(232,166,74,.07);padding:12px 16px;border-radius:0 8px 8px 0;color:var(--muted);font-size:15px;margin:16px 0}
+  .fix{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:14px}
+  .fix div{padding:14px 16px;border-bottom:1px solid var(--line);font-size:14.5px}
+  .fix div:nth-child(odd){background:var(--panel);color:var(--ink)}
+  .fix div:nth-child(even){background:var(--panel2);color:var(--muted)}
+  .fix .h{font:600 12px 'JetBrains Mono',monospace;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;background:var(--bg)!important}
+  @media(max-width:700px){.fix{grid-template-columns:1fr}}
+  footer{padding:40px 0 60px;color:var(--dim);font-size:14px}
+  code{font:13px 'JetBrains Mono',monospace;background:var(--panel2);padding:2px 6px;border-radius:4px;color:#f0d9b8}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Workflow test · Blender × iPhone × Seedance 2.5</div>
+    <h1>AI video models can't hold a camera. <em>So I handed one a phone.</em></h1>
+    <p class="lede">A 15-second single take: I gallop toward a camera on a tripod, grab it, and keep filming myself while a herd of loose horses overtakes me. No cut. The camera move was performed on an iPhone inside a grey Blender blockout, then Higgsfield's Seedance 2.5 painted the film on top of it.</p>
+    <div class="chips">
+      <span class="chip">Blender 5.2</span><span class="chip">VirtuCam (iPhone)</span><span class="chip">Higgsfield Blender plugin + Bridge</span>
+      <span class="chip">Soul Cinema stills</span><span class="chip">Seedance 2.5 · Cinema Studio 4.0</span><span class="chip">Claude as the build crew</span>
+    </div>
+    <p class="muted" style="margin-top:22px;font-size:14px">Recreating the horse reel from <a href="https://dodasjagusak.com/advanced-3d-ai-workflow.html">Dodas Jagušák's “The advanced 3D AI workflow”</a> to learn the pipeline end to end. Same shot, same beats, my own camera take, me as the rider.</p>
+  </div>
+</header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#film">The film</a><a href="#idea">The idea</a><a href="#steps">Process</a><a href="#refs">References</a>
+  <a href="#prompts">Prompts</a><a href="#fixes">What broke</a><a href="#next">Next</a>
+</div></nav>
+
+<section id="film"><div class="wrap">
+  <h2><span class="n">01 — THE FILM</span>Final render vs. the Blender take it came from</h2>
+  <p class="muted">Left is what Seedance 2.5 rendered. Right is the grey Blender playblast it was given as its camera reference: same camera, same timing, same beats. Press “Play both” to run them in sync.</p>
+  <div class="grid2" style="margin-top:18px">
+    <figure>
+      <video id="vFinal" src="assets/final_seedance.mp4" poster="assets/poster_final.jpg" controls playsinline preload="metadata"></video>
+      <figcaption><b>Seedance 2.5 final.</b> 15 s · 24 fps · native audio (hoofbeats, wind).</figcaption>
+    </figure>
+    <figure>
+      <video id="vBlock" src="assets/blender_playblast.mp4" poster="assets/poster_playblast.jpg" controls playsinline muted preload="metadata"></video>
+      <figcaption><b>Blender playblast (Video 1).</b> Grey blocks; the camera is my phone, recorded live through VirtuCam.</figcaption>
+    </figure>
+  </div>
+  <div class="player-controls">
+    <button id="playBoth">▶ Play both</button>
+    <button class="ghost" id="restartBoth">⟲ Restart</button>
+  </div>
+  <figure style="margin-top:22px">
+    <img src="assets/contact_sheet_final.jpg" alt="Contact sheet of the final Seedance take">
+    <figcaption><b>The final take, sampled.</b> Approach under the mesas → the hand closes over the lens → the whip → selfie with the herd closing in → the camera turns to the horses ahead → back to the face as the last horses pass.</figcaption>
+  </figure>
+</div></section>
+
+<section id="idea"><div class="wrap">
+  <h2><span class="n">02 — THE IDEA</span>A three-layer sandwich</h2>
+  <p class="muted">Text prompts describe a shot; they don't control it. A Blender blockout gives the model something it actually obeys: a real camera path, real timing and real staging, recorded by hand rather than typed.</p>
+  <div class="layers">
+    <div class="card layer"><div class="tag">Bottom layer</div><h4>My phone</h4><p>An iPhone running VirtuCam is the camera operator. Every tilt, shake and over-correction is a human move, recorded in one take.</p></div>
+    <div class="card layer"><div class="tag">Middle layer</div><h4>Blender</h4><p>A grey desert with horses, a rider, a tripod and mesas at real scale and real gallop speed. The phone drives one camera in that scene.</p></div>
+    <div class="card layer"><div class="tag">Top layer</div><h4>Seedance 2.5</h4><p>Takes the Blender playblast as its camera and layout reference, plus two stills for the look and the rider, and renders the film.</p></div>
+  </div>
+  <div class="note">I didn't model or keyframe anything by hand. I briefed Claude in plain English, and it built the scene inside my open Blender file through the Higgsfield Bridge connector. I reviewed contact sheets and gave notes, like a director with a build crew.</div>
+</div></section>
+
+<section id="steps"><div class="wrap">
+  <h2><span class="n">03 — PROCESS</span>What we actually did, in order</h2>
+  <ol class="steps">
+    <li><h4>Wire everything up</h4>
+      <p>Installed the Higgsfield Blender add-on (drag the signed .zip onto Blender, sign in) and the VirtuCam add-on for Blender 5.2 plus the iPhone app. In Claude, added two custom connectors: <code>Higgsfield</code> (generation) and <code>Higgsfield Bridge</code> (the cable into Blender).</p>
+      <p>Then a connection test: Claude dropped a grey test horse at the origin, rendered a frame and checked it. If that appears, everything is wired.</p></li>
+    <li><h4>Block out the scene in grey</h4>
+      <p>One brief: a flat dusty desert plain with mesas, rocks, scrub and dead trees, and a low warm sun. A camera on a tripod. A rider on a dapple-grey galloping straight at it, grabbing it and filming herself while five loose horses overtake. 15 s, 24 fps, 20mm lens, real units.</p>
+      <p>Claude built it in a new scene: a 1.6 m horse, a ~45 km/h gallop (0.47 m per frame), legs, neck, body bob and tail all running on drivers with one <code>gait</code> switch per horse, and a herd staggered 24–38 m behind so each horse overtakes at a different moment (frames 172 → 318). Timeline markers for every beat: tripod · reach (112) · <b>GRAB (134)</b> · selfie hold (150) · first horse passes · last horse · end (360).</p></li>
+    <li><h4>Rig one camera that changes hands</h4>
+      <p>The trick of the shot is that it's <b>one camera</b>, not two with a cut. It starts on the tripod, and from frame 134 to 137 it blends into the rider's hand. Its parent only ever copies <i>position</i>, never rotation, so the phone's rotation always sits cleanly on top and VirtuCam doesn't flip the view on connect.</p>
+      <p>A second helper carries the rotation “level phone → looking at her face”, faded in on the grab. Result: hold the phone level before the grab and you get the opening frame; hold it level after the grab and you get a selfie. Claude checked it numerically: no position jump through the grab, 0° aim error on the face from the selfie hold to the end.</p></li>
+    <li><h4>Review contact sheets, give notes</h4>
+      <p>Every change came back as a contact sheet rendered from the shot camera. The first one showed the selfie camera sitting on the line of the arm, so the sleeve filled the frame. That got fixed, and the tripod was raised to hand height (1.93 m).</p>
+      <figure style="margin-top:12px"><img src="assets/contact_sheet_blockout.jpg" alt="Contact sheet of the Blender blockout before the phone take"><figcaption><b>The blockout before any phone input.</b> Approach, reach, grab whip, selfie, herd overtaking.</figcaption></figure></li>
+    <li><h4>Shoot the camera with the phone</h4>
+      <p>Selected <code>CAM_main</code>, connected VirtuCam, held the phone level to check the opening frame, then played the timeline and performed the whole 15 seconds in one take. It was nearly still for the approach, then I moved like someone on a galloping horse after the grab, swung around to look at the herd running ahead, and came back to the face.</p>
+      <p>Take 1 missed the turn to the herd; take 2 got it (8.3–10.2 s). The prompt timecodes were rewritten to match my take rather than the original's.</p>
+      <figure style="margin-top:12px"><img src="assets/contact_sheet_phone_take.jpg" alt="Contact sheet of the VirtuCam phone take"><figcaption><b>Phone take 2 through the shot camera.</b> The handheld tilt and the turn to the horses ahead (grey's ears in the lower frame) are all phone moves.</figcaption></figure></li>
+    <li><h4>Export the playblast</h4>
+      <p>1920×1080 at 100%, H.264, 360 frames, with solid shading in the horses' colours and a light warm sky (a dark default viewport sky could push the model toward dusk). This MP4 is the most important file in the workflow; Seedance copies it beat for beat.</p></li>
+    <li><h4>Make two stills in Soul Cinema</h4>
+      <p><b>Image 1:</b> a three-panel character sheet from one selfie (headless front, back, face plate) on flat 18% grey with no lighting baked in. <b>Image 2:</b> one golden-hour still that carries the horses, the location, the light, the haze and the grain.</p></li>
+    <li><h4>Generate the film</h4>
+      <p>Cinema Studio 4.0 (Seedance 2.5 under the hood): Single shot · 8mm Film · Playtime palette · Lighting Auto · 16:9 · 15 s · audio on. References in order: Image 1, Image 2, Video 1.</p></li>
+  </ol>
+</div></section>
+
+<section id="refs"><div class="wrap">
+  <h2><span class="n">04 — REFERENCES</span>Two stills carry the whole look</h2>
+  <p class="muted">Fewer references, less to misread. The playblast carries the camera; these carry everything else.</p>
+  <div class="grid2" style="margin-top:16px">
+    <figure><a href="assets/image1_character_sheet.png"><img src="assets/image1_character_sheet.png" alt="Character sheet: headless front, back view, face close-up"></a>
+      <figcaption><b>Image 1 · character sheet.</b> Soul Cinema + one reference selfie · 35mm Film · Warm Vintage · 2k 16:9.</figcaption></figure>
+    <figure><a href="assets/image2_horses_world.png"><img src="assets/image2_horses_world.png" alt="Golden-hour still of a dapple-grey horse leading a small herd across a dusty plain"></a>
+      <figcaption><b>Image 2 · horses + world.</b> Soul Cinema · 8mm Film · Warm Vintage · 2k 16:9.</figcaption></figure>
+  </div>
+  <figure style="margin-top:18px"><video src="assets/blender_playblast.mp4" controls muted playsinline preload="none" poster="assets/poster_playblast.jpg"></video>
+    <figcaption><b>Video 1 · Blender take.</b> Camera, motion and terrain layout. Its look is ignored on purpose.</figcaption></figure>
+</div></section>
+
+<section id="prompts"><div class="wrap">
+  <h2><span class="n">05 — PROMPTS</span>What we sent, and what we changed</h2>
+  <p class="muted">All three prompts are adapted from the ones published in <a href="https://dodasjagusak.com/advanced-3d-ai-workflow.html">the original guide</a>. Out of respect for the author's work, this page doesn't republish his full prompts. It shows the settings and every part we rewrote. Grab the base prompts from his page (sections 04 and 05) and apply these changes.</p>
+
+  <h3>Image 1 · Character sheet</h3>
+  <div class="settings"><span>Higgsfield Soul Cinema</span><span>+ 1 reference selfie</span><span>Camera: 35mm Film</span><span>Lens: Warm Vintage</span><span>2k · 2048×1152</span></div>
+  <p class="muted">Base: the guide's character sheet prompt. Changes: “man” → “woman” throughout, the stubble line removed, the hair and identity lines below swapped in, and “no glasses” added. His outfit and every panel and lighting instruction were kept word for word.</p>
+  <div class="prompt"><div class="bar"><span>replacement lines</span><button data-copy>Copy</button></div><pre>The woman is the character from the attached reference — same face, same eyes, same skin, same freckles, same hair, same build in every panel.
+She is styled as a modern cowgirl with a 1980s register. Shoulder-length wavy platinum-blonde hair with natural silver-grey at the roots and crown, loose and slightly wind-tousled, no hat, no glasses.
+[…outfit paragraph unchanged…] No sunglasses, no glasses, no hat, no other accessories.
+CENTER PANEL — […] The wavy platinum-blonde hair with silver roots from behind, […]
+RIGHT PANEL — […] Hairline, brows, lashes, freckles, lip texture, skin detail, […]</pre></div>
+
+  <h3>Image 2 · Horses + world</h3>
+  <div class="settings"><span>Higgsfield Soul Cinema</span><span>Camera: 8mm Film</span><span>Lens: Warm Vintage</span><span>2k · 2048×1152</span></div>
+  <p class="muted">Unchanged: the guide's “horses still” prompt exactly as published.</p>
+
+  <h3>Video · Seedance 2.5 (Cinema Studio 4.0)</h3>
+  <div class="settings"><span>Single shot</span><span>Camera: 8mm Film</span><span>Palette: Playtime</span><span>Lighting: Auto</span><span>16:9 · 15 s · audio on</span><span>Image 1 → Image 2 → Video 1</span></div>
+  <p class="muted">Base: the guide's Seedance prompt. LOOK, NOTHING IN THE FOREGROUND, PHYSICS, AUDIO and the negatives were kept (pronouns switched to her). The blocks below were rewritten for my rider and <b>re-timed to my phone take</b>. That's the point of the markers: the ACTION timecodes follow your Blender take, not the original.</p>
+  <div class="prompt"><div class="bar"><span>CAMERA — opening line (rewritten)</span><button data-copy>Copy</button></div><pre>0.0–5.6s the viewpoint stands at head height above the plain, handheld but nearly still, tilted slightly down toward the ground, small drifts following the rider. 5.6–6.6s the grab. 6.6–15.0s the viewpoint is in the rider's right hand at arm's length, pointed back at her face, shaking and bouncing with every stride of the horse and every move of her arm, exactly like [Video 1].</pre></div>
+  <div class="prompt"><div class="bar"><span>THE GRAB (rewritten)</span><button data-copy>Copy</button></div><pre>THE GRAB — CRITICAL, no cut: at 5.6s her right hand reaches in from screen-right toward the lens, then in one unbroken motion the viewpoint is pulled up and swung around — half a second of motion-blurred tilted dirt, sky, sun glow and black sleeve whipping past as the arm turns the lens back toward her — and her face slides into frame and settles at arm's length by 6.6s, the abandoned tripod visible far behind her. One physical move from the fixed position into the hand.</pre></div>
+  <div class="prompt"><div class="bar"><span>RIDER — [Image 1] (rewritten)</span><button data-copy>Copy</button></div><pre>[Image 1] = the rider. Same woman, same face, freckles, shoulder-length wavy platinum-blonde hair with silver-grey roots, black western shirt with white pearl snaps and piped yokes, white t-shirt, gold chain, blue jeans, tooled leather belt with brass buckle, brown boots. No hat, no glasses, no sunglasses. She rides the dapple-gray horse bareback — no saddle, no bridle, no reins — left hand in the mane, right hand free. HER HAIR IS IN THE WIND the whole time: at a gallop the headwind pushes her hair back off her face and shoulders, waves and loose strands lifting, whipping and flicking with every stride, never neat, never still.</pre></div>
+  <div class="prompt"><div class="bar"><span>ACTION — timed to my take (rewritten)</span><button data-copy>Copy</button></div><pre>ACTION: 0–3s the rider on the gray gallops straight toward the lens from the distance beneath the mesas, the other five horses loose 20–40 metres behind her, dust streaming. 3–5.6s she closes fast, slightly toward screen-right, eyes on the lens, right arm reaching out, hair blown back by the headwind. 5.6–6.6s the grab. 6.6–8.3s her face and shoulders at arm's length, the loose horses closing in behind her, frame bouncing and tilting; hair whipping back in the wind, strands flicking across her face, shirt collar fluttering; eyes narrowed against the sun and wind, a small confident smile — no wide grin, no blank stare. 7.1s the first loose horse draws level beside her. 8.3–10.3s the camera swings around to look ahead past her horse: the loose horses running ahead across the plain toward the big hill on the horizon, her own gray horse's ears and mane in the lower frame, dust and the low sun. 10.3–10.8s the camera swings back to her face. 10.8–15s her face at arm's length, hair still blowing, smile held, the last loose horses overtaking close on both sides and pulling ahead, glancing at the horses and back to the lens.</pre></div>
+</div></section>
+
+<section id="fixes"><div class="wrap">
+  <h2><span class="n">06 — WHAT BROKE</span>Problems we hit, and what fixed them</h2>
+  <div class="fix">
+    <div class="h">Problem</div><div class="h">Fix</div>
+    <div>Higgsfield Bridge connector said <i>Unauthorized</i>.</div><div>Removed and re-added it with Blender open, and finished the sign-in window all the way through.</div>
+    <div>Bridge connected, but Blender still “not connected”.</div><div>In Blender's Higgsfield panel, press <b>Connect</b> under Supercomputer Connection (“driven by MCP”).</div>
+    <div>Claude couldn't open the plugin's viewport screenshot links.</div><div>It rendered frames to disk in the project folder and read those instead. Contact sheets live in the folder for both of us.</div>
+    <div>Selfie camera sat on the line of the arm, so the sleeve filled the frame.</div><div>Moved the grip point ~20 cm above the fingertips, off the arm line, so the lens looks past the arm at the face.</div>
+    <div>First VirtuCam take only captured ~0.7 s, tilted down.</div><div>Start on frame 1, arm recording, play all 360 frames, stop, and save the take in the app. Find your “level” before recording.</div>
+    <div>The phone take missed the turn to the herd at 11.5 s.</div><div>Re-shot it; the turn landed at 8.3–10.2 s. Re-timed the prompt to the take instead of re-shooting again.</div>
+    <div>The black tripod head poked into the bottom of the frame when the phone tilted down.</div><div>Hid the tripod head in the playblast. Anything shaped like equipment gets painted as equipment.</div>
+    <div>Couldn't find “Render Playblast” in the Higgsfield bar.</div><div>Claude exported it straight from Blender's viewport (1920×1080, H.264) through the Bridge.</div>
+    <div>Dark default viewport sky in the first playblast.</div><div>Set a light warm viewport background so the reference doesn't read as dusk.</div>
+  </div>
+</div></section>
+
+<section id="next"><div class="wrap">
+  <h2><span class="n">07 — NEXT</span>What I'd change on the next pass</h2>
+  <div class="grid3" style="margin-top:14px">
+    <div class="card"><h4 style="margin:0 0 6px;font:600 17px Fraunces,serif">Keep the opening clean</h4><p class="muted" style="margin:0;font-size:14.5px">A dark shape still appears at the bottom of the first second. Keep the phone higher during the approach, and remove or hide every bit of tripod near the lens before the playblast.</p></div>
+    <div class="card"><h4 style="margin:0 0 6px;font:600 17px Fraunces,serif">Lock the likeness harder</h4><p class="muted" style="margin:0;font-size:14.5px">The character sheet is the identity anchor for the whole film. Generate a few sheets and pick the closest to the reference, or use more than one reference photo.</p></div>
+    <div class="card"><h4 style="margin:0 0 6px;font:600 17px Fraunces,serif">Try it open source</h4><p class="muted" style="margin:0;font-size:14.5px">The Blender half is model-agnostic. The same take can drive Wan VACE in ComfyUI, using a clean depth pass rendered from the same camera as the control video.</p></div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  Shot, directed and performed by Dominika Best · Built with Claude via the Higgsfield Bridge · Workflow and original prompts by <a href="https://dodasjagusak.com/advanced-3d-ai-workflow.html">Dodas Jagušák</a> · Made in Blender 5.2, VirtuCam, Higgsfield Soul Cinema and Cinema Studio 4.0 (Seedance 2.5).
+</div></footer>
+
+<script>
+  const a = document.getElementById('vFinal'), b = document.getElementById('vBlock');
+  document.getElementById('playBoth').onclick = () => {
+    b.currentTime = a.currentTime;
+    if (a.paused) { a.play(); b.play(); } else { a.pause(); b.pause(); }
+  };
+  document.getElementById('restartBoth').onclick = () => { a.currentTime = 0; b.currentTime = 0; a.play(); b.play(); };
+  a.addEventListener('seeked', () => { if (Math.abs(b.currentTime - a.currentTime) > 0.15) b.currentTime = a.currentTime; });
+  a.addEventListener('pause', () => b.pause());
+  document.querySelectorAll('[data-copy]').forEach(btn => btn.onclick = async () => {
+    const t = btn.closest('.prompt').querySelector('pre').innerText;
+    try { await navigator.clipboard.writeText(t); btn.textContent = 'Copied'; setTimeout(() => btn.textContent = 'Copy', 1400); } catch (e) {}
+  });
+</script>
+</body>
+</html>
